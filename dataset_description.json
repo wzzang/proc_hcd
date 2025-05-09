@@ -1,0 +1,28 @@
+{
+    "Name": "multibandACQtests",
+    "BIDSVersion": "1.7.0",
+    "License": "PDDL",
+    "Authors": [
+        "Joset A. Etzel", 
+        "Debbie Yee",
+		"Bidhan Lamichhane",
+		"Mitchell Jeffers",
+		"Elisa Di Rosa",
+		"Jenny Crawford",
+		"Hongyu An",
+        "Todd S. Braver"
+    ],
+	"Acknowledgements": "We thank Rachel E. Brough, Rebecca Feldman, Alexander Kizhner, Mary E. Kleinman, Abraham Snyder, Aaron Tanenbaum, and Allison Tay.",
+    "Funding": [
+        "This research was supported by NIH/NIA 5R01AG070139-02 to Tammy English, Renee J. Thompson, and Todd S. Braver.",
+		"This research was supported by NIH R37MH066078 and NIH R21AG058206 to Todd S. Braver.",
+        "This research was supported by NIH NINDS 1P30NS098577 to Hongyu An.",
+        "Image acquisition was partially supported by Mallinckrodt Institute of Radiology, Washington University in St. Louis."
+    ],
+    "ReferencesAndLinks": [
+        "https://sites.wustl.edu/ccplab/",
+		"https://sites.wustl.edu/dualmechanisms/",
+        "https://www.mir.wustl.edu/research/core-resources/center-for-clinical-imaging-research/"
+    ],
+    "DatasetDOI": "https://doi.org/10.18112/openneuro.ds001399.v1.0.2"
+}
