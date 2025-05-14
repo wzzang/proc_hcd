@@ -4,11 +4,11 @@
 ## adapted from typical proc pipeline
   # Major modifactions:
   # a. updated scan dir keys 
-  # b. recoded ssan dir namestring to fit bidsficiation requirements
+  # b. recoded ssan dir namestring to meet bidsficiation requirements
   # c. expanded JSON section to include all possible irregularities
-  # d. updated minimal seconds to survive xcp-d censoring 
-    # 240sec from 478 frames --> 127sec from 253 frames: maintaining 0.502 ratio   
-
+  # d. updated minimum duration for surviving xcp-d censoring 
+    # changed from 240sec (478 frames) to 127sec (253 frames) 
+    # to maintain 0.502 ratio
 
 
 #####################################################################
@@ -75,10 +75,9 @@ unproc_dir=${ceph_dir}/${sub}/unprocessed
 sub_id=$(echo "${sub}" | awk -F"_" '{print $1}')
 sub_dir=${wk_dir}/${sub}/BIDS/sub-${sub_id}/ses-01/
 
-echo "Processing $sub_id "
+echo "Processing ${sub_id} "
 if [ ! -d ${wk_dir}/${sub} ]; then
     mkdir -p ${wk_dir}/${sub}
-    # echo  "${wk_dir}/${sub_id}"
 fi
 time=$(date "+%Y-%m-%d %H:%M:%S")
 echo "## Proc Job Starts for $sub_id @ ${time}" >> ${sub_log}
@@ -263,7 +262,6 @@ if [ ! -f ${fprep_job} ] && [ ${bids_check} -gt 0 ]; then
             echo ".. .. completed!" >> ${sub_log}
             xcpd_flag=1		
             echo "" > ${fprep_job}
-            break
         else
             echo "fMRIPrep: error found!"
             echo ".. .. failed!" >> ${sub_log}            

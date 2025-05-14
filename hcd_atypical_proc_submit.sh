@@ -6,8 +6,7 @@
 # set dirs
 wd=/scratch/weiz/projects/HCPD
 log_dir=${wd}/logs
-# code_dir=/ceph/chpc/shared/deanna_barch_group/hcd_code
-code_dir=/scratch/weiz/projects/HCPD/hcd_code
+code_dir=/ceph/chpc/shared/deanna_barch_group/hcd_code
 sub_list=${code_dir}/RL2.0_subs_formatted.txt
 
 # create log dir to store job stdout files
@@ -45,8 +44,6 @@ do
     fi
 done
 
-# Nsubs=${#subs[@]}
-# echo $Nsubs
 
 
 ###################################
@@ -68,12 +65,10 @@ for s in ${subs[@]}; do
     fi
 done
 
-# echo "priority subs N = ${#ordered_subs[@]}"
-# echo "non priority subs N = ${#remaining[@]}"
 
 # Combine lists
 sorted_subs=("${ordered_subs[@]}" "${remaining[@]}")
-# echo "Sorted subs N = ${#sorted_subs[@]}"
+
 
 
 
@@ -83,8 +78,7 @@ sorted_subs=("${ordered_subs[@]}" "${remaining[@]}")
 
 count=0
 # start job submission from the 31st sub
-# for i in ${sorted_subs[@]} ; do
-for i in HCD0187850_V1_MR ; do
+for i in ${sorted_subs[@]} ; do
     # echo $i              
  
     count=$((count+1))
@@ -97,29 +91,3 @@ done
 echo "total n = $count "
 
 
-# dt_dir=/ceph/intradb/archive/CinaB/CCF_HCD_STG/
-# cd ${dt_dir}
-# subs=(HCD*MR)
-# count=0
-# for i in ${subs[@]}; do               
-#     sub_dir=${dt_dir}/${i}/unprocessed
-    
-#     if [ -d ${sub_dir} ]; then
-#         # echo $i
-#         cd ${sub_dir}
-#         # echo "In $sub_dir, found: ${tgt_dirs[*]}"
-#         tgt_dirs=(*REST*)        
-#         for k in ${tgt_dirs}; do
-#             if [[ "$k" == *1a* ]] || [[ "$k" == *1b* ]]; then
-#                 # echo $i
-#                 echo $i >> /scratch/weiz/projects/HCPD/aty_subs
-#             else
-#                 echo $i >> /scratch/weiz/projects/HCPD/ty_subs
-#                 count=$((count+1))
-#                 # echo $count
-#             fi
-#         done
-#     fi
-# done
-
-# echo "typical N = $count "
