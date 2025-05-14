@@ -5,7 +5,7 @@
     # using the censored timeseries; eg, 'good' time points
     # indicated in outlier.tsv
 # 2. generate pconn.nii.gz
-# 3. extract matrix to .csv
+# 3. extract matrix to .tsv
 
 
 
