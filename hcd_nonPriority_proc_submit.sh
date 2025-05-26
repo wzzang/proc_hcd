@@ -5,7 +5,7 @@
 # set dirs
 wd=/scratch/weiz/projects/HCPD
 log_dir=${wd}/logs
-code_dir=/ceph/chpc/shared/deanna_barch_group/hcd_code
+code_dir=${wd}/hcd_code
 sub_list=${code_dir}/RL2.0_subs_formatted.txt
 
 # create log dir to store job stdout files
@@ -60,21 +60,21 @@ sorted_subs=($(printf "%s\n" "${sorted_subs[@]}" | awk '!seen[$0]++'))
 echo "Final subs N = ${#sorted_subs[@]}"
 
 
-###########################
-####### SUBMIT JOBS #######
-###########################
+##########################
+###### SUBMIT JOBS #######
+##########################
 
-# count=0
-# # start job submission from the 31st sub
-# for i in ${sorted_subs[@]} ; do
-#     echo $i              
+count=0
+# start job submission from the 31st sub
+for i in ${sorted_subs[@]} ; do
+    echo $i              
 
-#     # prioritize "V1" scans    
-#     count=$((count+1))
-#     # sbatch --job-name=proc_${i} --output=${log_dir}/%x_%j.out \
-#     #     --error=${log_dir}/%x_%j.err \
-#     #     ${code_dir}/hcd_proc_run.sh "${wd}" "${i}" "${code_dir}"
+    # prioritize "V1" scans    
+    count=$((count+1))
+    sbatch --job-name=proc_${i} --output=${log_dir}/%x_%j.out \
+        --error=${log_dir}/%x_%j.err \
+        ${code_dir}/hcd_proc_run.sh "${wd}" "${i}" "${code_dir}"
 
-# done
+done
 
-# echo "total n = $count "
+echo "total n = $count "
