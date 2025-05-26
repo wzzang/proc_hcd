@@ -14,26 +14,27 @@
 ########### DEFINE FUNCTION ########### 
 gen_fc_matrix() {
     ## Arguments
-    # $1 = atlas_name (e.g., schaefer400, gordon333, cabp)
+    # $1 = atlas_name (e.g., schaefer456, gordon333, cabp)
     # $2 = func_dir (e.g., /../HCPD/HCD0015417_V1_MR/xcpd/sub-HCD0015417/ses-01/func)
     # $3 = sub_id (e.g., HCD0015417)
     # $4 = opt_dir (e.g., /../HCPD/HCD0015417_V1_MR/post_xcpd)
+    # $5 = denoised dtseries file name
 
     atlas_name=$1
     func_dir=$2
     sub_id=$3
     opt_dir=$4
+    dtseries_file=$5
+    outlier_file=$6
 
-     echo " ${sub_id}: ${atlas_name} "
-
+    echo " ** ${atlas_name} "
+    
     module load workbench
     fn_cmd=/export/workbench/workbench-1.5.0_take2/bin_rh_linux64/wb_command
 
     # === Get Files === #
-    atlas_dir=/ceph/chpc/shared/deanna_barch_group/hcd_code/atlas    
-    dtseries_file=${func_dir}/sub-${sub_id}_ses-01_task-rest_space-fsLR_den-91k_desc-denoised_bold.dtseries.nii
-    outlier_file=${func_dir}/sub-${sub_id}_ses-01_task-rest_outliers.tsv
-    
+    atlas_dir=/ceph/chpc/shared/deanna_barch_group/hcd_code/atlas       
+        
     # === Sanity Check === #
     if [ ! -f ${dtseries_file} ]; then
         echo "ERROR: dtseries file not found: ${dtseries_file}"
@@ -57,10 +58,10 @@ gen_fc_matrix() {
     # === Parcellation === #
     ptseries_file=${opt_dir}/sub-${sub_id}_ses-01_task-rest_space-fsLR_seg-${atlas_name}_stat-mean_timeseries.ptseries.nii
     if [ ! -f ${ptseries_file} ] ; then
-        echo "... Generate ptseries "
+        echo ".. .. Generate ptseries "
         ${fn_cmd} -cifti-parcellate ${dtseries_file} ${par_file} COLUMN ${ptseries_file}
     else
-        echo "... skip! ptseries exists"
+        echo ".. .. skip! ptseries exists"
     fi
 
 
@@ -80,9 +81,9 @@ gen_fc_matrix() {
             tr '01' '10' < ${opt_dir}/outlier.tsv > ${mask_file}
         fi
 
-        echo "... Calc pconn "    
-        ${fn_cmd} -cifti-correlation ${ptseries_file} ${pconn_file} -weights ${opt_dir}/tmask.tsv -fisher-z
-        echo "... Export tsv "    
+        echo ".. .. Calc pconn "    
+        ${fn_cmd} -cifti-correlation ${ptseries_file} ${pconn_file} -weights ${mask_file} -fisher-z
+        echo ".. .. Export tsv "    
         ${fn_cmd} -cifti-convert -to-text ${pconn_file} ${tsv_file}
 
         # Clean
@@ -90,7 +91,7 @@ gen_fc_matrix() {
             rm ${opt_dir}/outlier.tsv
         fi
     else
-        echo "... skip! outputs exist"
+        echo ".. .. skip! outputs exist"
     fi
 
 }  
