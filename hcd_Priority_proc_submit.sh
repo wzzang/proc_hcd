@@ -28,13 +28,12 @@ mapfile -t subs < ${sub_list}
 count=0
 # start job submission from the 31st sub
 for i in ${subs[@]} ; do
-    if [[ "$i" != "HCD0001305_V1_MR" ]] ; then
-        echo $i                
-        count=$((count+1))
-        sbatch --job-name=proc_${i} --output=${log_dir}/%x_%j.out \
-            --error=${log_dir}/%x_%j.err \
-            ${code_dir}/hcd_proc_run.sh "${wd}" "${i}" "${code_dir}"
-    fi
+    echo $i                
+    count=$((count+1))
+    sbatch --job-name=proc_${i} --output=${log_dir}/%x_%j.out \
+        --error=${log_dir}/%x_%j.err \
+        ${code_dir}/hcd_proc_run.sh "${wd}" "${i}" "${code_dir}"
+    
 done
 
 echo "total n = $count "

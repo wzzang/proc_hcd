@@ -32,7 +32,7 @@
 # set dirs
 ceph_dir=/ceph/intradb/archive/CinaB/CCF_HCD_STG/
 # if transfer data
-# shared_dir=/ceph/chpc/shared/deanna_barch_group/XXX 
+shared_dir=/ceph/chpc/shared/deanna_barch_group/weiz/HCD_Preproc 
 wk_dir=$1 # where data & outputs locate
 sub=$2 # in format of HCDXXXXXX_VX_MR
 log_dir=${wk_dir}/logs
@@ -54,12 +54,12 @@ xcpd_container=${code_dir}/xcp_d-0.10.6.sif
 ################ START PROC ################
 ############################################ 
 
-echo "Processing $sub_id "
-if [ ! -d ${wk_dir}/${sub_id} ]; then
-    mkdir -p ${wk_dir}/${sub_id}
+echo "Processing $sub "
+if [ ! -d ${wk_dir}/${sub} ]; then
+    mkdir -p ${wk_dir}/${sub}
 fi
 time=$(date "+%Y-%m-%d %H:%M:%S")
-echo "## Proc Job Starts for $sub_id @ ${time}" >> ${sub_log}
+echo "## Proc Job Starts for $sub @ ${time}" >> ${sub_log}
 
 # sub_num=`echo "$i" | sed 's/[^0-9]//g'`
 unproc_dir=${ceph_dir}/${sub}/unprocessed
@@ -135,7 +135,7 @@ else
 fi
 
 # record sub w/ irregularities
-if [ $count -gt 0 ] ; then
+if [ $count -eq 4 ] ; then
     echo ${sub_id} >> ${log_dir}/irregular_data_struc_subs
     bids_check=0 # check failed
 else
@@ -195,7 +195,8 @@ fi
 # create a dummy file to idnicate completion of job
 fprep_job=${wk_dir}/${sub}/fprep_finished
 # only run job if bids check succeeded
-if [ ! -f ${fprep_job} ] && [ ${bids_check} -gt 0 ]; then
+# if [ ! -f ${fprep_job} ] && [ ${bids_check} -gt 0 ]; then
+if [ ! -f ${fprep_job} ]; then
 
     echo " .. start fMRIPrep .."   
     
@@ -218,17 +219,17 @@ if [ ! -f ${fprep_job} ] && [ ${bids_check} -gt 0 ]; then
         --cifti-output \
         --nthreads 16 \
         --omp-nthreads 8 \
-        --mem-mb 80000
+        --mem-mb 30000
 
         #search derivative html file for the code block that indicates no errors were found
         if grep -Pzoq '<div id="errors">[\s\S]*?<p>No errors to report!<\/p>[\s\S]*?<\/div>' \
                 "${wk_dir}/${sub}/derivatives/sub-${sub_id}.html" ; then
             # No errors found, quit command loop
             echo "fMRIPrep: NO error found!"
-            echo ".. .. completed!" >> ${wk_dir}/${sub_id}/proc_job_log
+            echo ".. .. completed!" >> ${sub_log}
             xcpd_flag=1		
             echo "" > ${fprep_job}
-            break
+            # break
         else
             echo "fMRIPrep: error found!"
             echo ".. .. failed!" >> ${sub_log}            
@@ -295,7 +296,7 @@ if [ -f ${fprep_job} ]; then
         --mode abcd \
         --abcc-qc y \
         --create-matrices all \
-        --atlases 4S456Parcels \
+        --skip-parcellation \
         --fd-thresh 0.3 \
         --nthreads 16 \
         --omp-nthreads 8 \
@@ -308,7 +309,7 @@ if [ -f ${fprep_job} ]; then
 		echo "XCPD: NO error found!"
         echo ".. .. completed!" >> ${sub_log}
         echo "" > ${xcpd_job}	
-		break
+		# break
 	else
         echo "XCPD: error found!"
         echo ".. .. failed!" >> ${sub_log}
@@ -326,16 +327,26 @@ fi
 ############### DATA TRANSFER ###############
 #############################################
 
-# if [ ${del_flag} -eq 1 ]; then
-#     # set dir
-#     sc_dir=${wk_dir}/${sub_id}
-#     dst_dir=${shared_dir}
+if [ -f ${xcpd_job} ]; then
+    # set dir
+    sc_dir=${wk_dir}/${sub}
+    dst_dir=${shared_dir}
 
-#     # remove BIDS dir
-#     rm -rf ${sc_dir}/BIDS
-#     echo ".. Data Transfer" >> ${sub_log}
-#     scp -r ${sc_dir} ${ds_dir}/
+    # remove BIDS dir
+    # rm -rf ${sc_dir}/BIDS
+    echo ".. Start Data Transfer" >> ${sub_log}
+    rsync -a --partial ${sc_dir} ${dst_dir}/ >> ${sub_log} 2>&1
+    status=$?
 
-# fi
+    # check transfer & delete source copy
+    if [ $status -eq 0 ]; then
+        echo ".. Completed Data Transfer" >> ${sub_log}
+        rm -rf ${sc_dir}
+        # echo ".. Deleted Source Copy" >> ${dst_dir}/${sub}/proc_job_log
+    else
+        echo ".. Transfer failed; rsync exited with code $status" >> ${sub_log}
+    fi
+
+fi
 
 
