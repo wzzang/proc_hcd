@@ -16,8 +16,9 @@
         # var1 = sub (e.g., HCD0015417_V1_MR)
         # var2 = motion file name with full path
         # var3 = output directory (eg, post_xcpd)
-        
-code_dir=/scratch/weiz/projects/HCPD/hcd_code
+
+
+code_dir=/scratch/weiz/projects/HCPD/hcd_code/
 source ${code_dir}/gen_fc_mtx.sh
 source ${code_dir}/extract_fd.sh
 
@@ -31,42 +32,47 @@ else
 fi
 
 
+
 # get sub list
 # !! make sure to differentiate vars of sub and sub_id 
 ceph_dir=/ceph/chpc/shared/deanna_barch_group/weiz/HCD_Preproc
-sub_list=${code_dir}/RL2.0_subs_formatted.txt
-
+# sub_list=${code_dir}/RL2.0_subs_formatted.txt
 # sub list w/ incomplete runs
-incomplete_subs=(HCD0129937_V1_MR HCD0494354_V1_MR HCD0671956_V1_MR HCD0678970_V1_MR \
-HCD1565356_V1_MR HCD1769978_V1_MR HCD1778474_V1_MR HCD2115835_V1_MR \
+run1_subs=(HCD0129937_V1_MR HCD0494354_V1_MR HCD0671956_V1_MR HCD0678970_V1_MR \
+HCD1565356_V1_MR HCD1769978_V1_MR HCD1778474_V1_MR \
 HCD2913459_V1_MR HCD2982276_V1_MR)
+PA_subs=( HCD2115835_V1_MR )
 
 mapfile -t subs < ${sub_list}
 count=0
 for sub in ${subs[@]} ; do
+
     echo "### Processing ${sub} ###"
 
     sub_id=$(echo ${sub} | awk -F"_" '{print $1}')
-    # check if all runs exist
-    if [[ " ${incomplete_subs[*]} " != *" $sub "* ]] ; then
-        
+    
+    # check scan pattern
+    if [[ " ${run1_subs[*]} " == *" $sub "* ]] ; then        
+        dtseries_name=ses-01_task-rest_run-01_space-fsLR_den-91k_desc-denoised_bold.dtseries.nii
+        outlier_file_name=ses-01_task-rest_dir-AP_run-01_outliers.tsv
+        mtion_file_name=ses-01_task-rest_dir-AP_run-01_motion.tsv
+    elif [[ " ${PA_subs[*]} " == *" $sub "* ]] ; then
+        dtseries_name=ses-01_task-rest_dir-PA_space-fsLR_den-91k_desc-denoised_bold.dtseries.nii
+        outlier_file_name=ses-01_task-rest_dir-PA_outliers.tsv
+        mtion_file_name=ses-01_task-rest_dir-PA_motion.tsv
+    else
+        # typical subs 
         dtseries_name=ses-01_task-rest_space-fsLR_den-91k_desc-denoised_bold.dtseries.nii
         outlier_file_name=ses-01_task-rest_outliers.tsv
         mtion_file_name=ses-01_task-rest_motion.tsv
-    else
-        
-        dtseries_name=ses-01_task-rest_run-01_space-fsLR_den-91k_desc-denoised_bold.dtseries.nii
-        outlier_file_name=ses-01_task-rest_run-01_outliers.tsv
-        mtion_file_name=ses-01_task-rest_run-01_motion.tsv
     fi
+
     # check if xcpd completed        
-    func_dir=${ceph_dir}/${sub}/xcpd/sub-${sub_id}/ses-01/func
-    # regular file
+    func_dir=${ceph_dir}/${sub}/xcpd/sub-${sub_id}/ses-01/func    
     func_file=${func_dir}/sub-${sub_id}_${dtseries_name}
     outlier_file=${func_dir}/sub-${sub_id}_${outlier_file_name}
-    mtion_file=${func_dir}/sub-${sub_id}_${mtion_file_name}
+    mtion_file=${func_dir}/sub-${sub_id}_${mtion_file_name}    
     
-
     if [ -f ${func_file} ]; then      
         # Specify output directory
         out_dir=${ceph_dir}/${sub}/post_xcpd
