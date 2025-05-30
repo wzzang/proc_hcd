@@ -38,10 +38,8 @@ fi
 ceph_dir=/ceph/chpc/shared/deanna_barch_group/weiz/HCD_Preproc
 # sub_list=${code_dir}/RL2.0_subs_formatted.txt
 # sub list w/ incomplete runs
-run1_subs=(HCD0129937_V1_MR HCD0494354_V1_MR HCD0671956_V1_MR HCD0678970_V1_MR \
-HCD1565356_V1_MR HCD1769978_V1_MR HCD1778474_V1_MR \
-HCD2913459_V1_MR HCD2982276_V1_MR)
-PA_subs=( HCD2115835_V1_MR )
+run1_subs=()
+PA_subs=()
 
 mapfile -t subs < ${sub_list}
 count=0
